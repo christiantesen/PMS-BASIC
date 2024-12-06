@@ -236,7 +236,7 @@ app.get('/api/tasks/:taskId/history', auth, asyncHandler(async (req, res) => {
 }));
 
 // Users routes (MANAGER and ADMIN only)
-app.get('/api/users', auth, checkRole(['MANAGER', 'ADMIN']), asyncHandler(async (req, res) => {
+app.get('/api/users', auth, checkRole(['MANAGER', 'ADMIN']), asyncHandler(async (_, res) => {
   // Returns Manager and Developer roles
   const usersList = await db.select().from(users).where(or(eq(users.role, 'MANAGER'), eq(users.role, 'DEVELOPER')));
   res.json(usersList);
