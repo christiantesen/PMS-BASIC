@@ -127,7 +127,7 @@ app.post(
   "/api/projects",
   auth,
   checkRole(["ADMIN", "MANAGER"]),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: any, res) => {
     const { name, description, status, startDate, endDate } = req.body;
     const [project] = await db
       .insert(projects)
@@ -162,7 +162,7 @@ app.post(
   "/api/projects/:projectId/tasks",
   auth,
   checkRole(["ADMIN", "MANAGER"]),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: any, res) => {
     const { projectId } = req.params;
     const { title, description, status, priority, assigneeId, dueDate } =
       req.body;
@@ -201,7 +201,7 @@ app.post(
   "/api/tasks/:taskId/assign",
   auth,
   checkRole(["ADMIN", "MANAGER"]),
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: any, res) => {
     const { taskId } = req.params;
     const { assigneeId } = req.body;
 
