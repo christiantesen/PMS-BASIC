@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express from "express";
 import { db } from "./db";
 import { users, projects, tasks, taskHistory } from "./db/schema";
@@ -22,25 +21,26 @@ const auth = asyncHandler(async (req: any, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
   if (!token) {
     res.status(401).json({ error: "Please authenticate" });
-    return;
+  } else {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, decoded.userId));
+      if (!user) {
+        throw new Error();
+      }
+      req.userId = decoded.userId;
+      req.userRole = user.role;
+      next();
+    } catch (error) {
+      res.status(401).json({ error: "Please authenticate" });
+      console.log(error);
+    }
   }
 
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, decoded.userId));
-    if (!user) {
-      throw new Error();
-    }
-    req.userId = decoded.userId;
-    req.userRole = user.role;
-    next();
-  } catch (error) {
-    res.status(401).json({ error: "Please authenticate" });
-    console.log(error);
-  }
+  
 });
 
 // Role-based middleware
