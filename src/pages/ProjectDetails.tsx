@@ -107,7 +107,7 @@ export default function ProjectDetails() {
         {(user?.role === 'ADMIN' || user?.role === 'MANAGER') && (
           <Button onClick={() => setIsCreatingTask(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Task
+            Agregar Tarea
           </Button>
         )}
       </div>

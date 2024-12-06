@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import express from 'express';
 import { db } from './db';
 import { users, projects, tasks, taskHistory } from './db/schema';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, or, inArray } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
@@ -35,6 +36,7 @@ const auth = asyncHandler(async (req: any, res, next) => {
     next();
   } catch (error) {
     res.status(401).json({ error: 'Please authenticate' });
+    console.log(error);
   }
 });
 
@@ -87,10 +89,14 @@ app.get('/api/projects', auth, asyncHandler(async (req: any, res) => {
     const assignedTasks = await db.select()
       .from(tasks)
       .where(eq(tasks.assigneeId, req.userId));
-    const projectIds = [...new Set(assignedTasks.map(t => t.projectId))];
-    query = query.where(eq(projects.id, projectIds));
+    const projectIds = [...new Set(assignedTasks.map(t => t.projectId))].filter(id => id !== null);
+    if (projectIds.length > 0) {
+      query = query.where(inArray(projects.id, projectIds));
+    } else {
+      // Si no hay projectIds, devolver una lista vacía
+      return res.json([]);
+    }
   }
-  
   const projectsList = await query;
   res.json(projectsList);
 }));
